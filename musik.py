@@ -3,6 +3,10 @@ from pygame.locals import *
 import sys
 import random
 
+# Füge dies hinzu, um den Mixer zu importieren und zu initialisieren
+import pygame.mixer
+pygame.mixer.init()
+
 pygame.init()
 vec = pygame.math.Vector2 
 
@@ -17,7 +21,11 @@ FramePerSec = pygame.time.Clock()
 displaysurface = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Platformer")
 
+# Lade den Sound
+death_sound = pygame.mixer.Sound('death_sound.wav')
+
 class Player(pygame.sprite.Sprite):
+    # ... (Klasse bleibt unverändert)
     def __init__(self):
         super().__init__()
         self.surf = pygame.Surface((30, 30))
@@ -29,6 +37,7 @@ class Player(pygame.sprite.Sprite):
         self.acc = vec(0,0)
 
     def move(self):
+        # ... (Methode bleibt unverändert)
         self.acc = vec(0,0.5)
     
         pressed_keys = pygame.key.get_pressed()
@@ -50,6 +59,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.midbottom = self.pos
     
     def update(self):
+        # ... (Methode bleibt unverändert)
         hits = pygame.sprite.spritecollide(P1 , platforms, False)
         if hits:
             if P1.vel.y > 0:
@@ -57,11 +67,13 @@ class Player(pygame.sprite.Sprite):
                 self.vel.y = 0
 
     def jump(self):
+        # ... (Methode bleibt unverändert)
         hits = pygame.sprite.spritecollide(self, platforms, False)
         if hits:
             self.vel.y = -15 
 
 class Platform(pygame.sprite.Sprite):
+    # ... (Klasse bleibt unverändert)
     def __init__(self):
         super().__init__()
         self.surf = pygame.Surface((random.randint(5,100), 12))
@@ -85,12 +97,13 @@ for x in range(random.randint(5, 50)):
     platforms.add(pl)
     all_sprites.add(pl)
 
-
 platforms.add(PT1)
 
 while True:
-    
+    # Überprüfe, ob der Spieler gestorben ist
     if P1.pos.y >= 450:
+        death_sound.play()
+        pygame.time.delay(2000)  # Warte 2 Sekunden, damit der Sound abgespielt wird
         pygame.quit()
         sys.exit()
 
@@ -112,7 +125,6 @@ while True:
         platforms.sprites()[index].rect.midbottom = (0, 1000)
         platforms.remove(platforms.sprites()[index])
 
-
     displaysurface.fill((0,0,0))
  
     for entity in all_sprites:
@@ -120,4 +132,3 @@ while True:
  
     pygame.display.update()
     FramePerSec.tick(fps)
-
