@@ -13,7 +13,6 @@ run = True
 
 while run:
 
-    screen.fill((0, 0, 0))
 
     pygame.draw.rect(screen, (255, 0, 0), player)
 
