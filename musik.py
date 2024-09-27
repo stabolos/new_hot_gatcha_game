@@ -42,6 +42,7 @@ class Player(pygame.sprite.Sprite):
         self.pos = vec((10, 385))
         self.vel = vec(0,0)
         self.acc = vec(0,0)
+        self.jumping = False
 
     def move(self):
         self.acc = vec(0,0.5)
@@ -65,21 +66,29 @@ class Player(pygame.sprite.Sprite):
         self.rect.midbottom = self.pos
     
     def update(self):
-        hits = pygame.sprite.spritecollide(P1 , platforms, False)
-        if hits:
-            if P1.vel.y > 0:
-                self.pos.y = hits[0].rect.top + 1
-                self.vel.y = 0
+        hits = pygame.sprite.spritecollide(self ,platforms, False)
+        if self.vel.y > 0:        
+            if hits:
+                if self.pos.y < hits[0].rect.bottom:               
+                    self.pos.y = hits[0].rect.top +1
+                    self.vel.y = 0
+                    self.jumping = False
 
-    def jump(self):
+    def jump(self): 
         hits = pygame.sprite.spritecollide(self, platforms, False)
-        if hits:
-            self.vel.y = -15 
+        if hits and not self.jumping:
+           self.jumping = True
+           self.vel.y = -15
+ 
+    def cancel_jump(self):
+        if self.jumping:
+            if self.vel.y < -3:
+                self.vel.y = -3
 
 class Platform(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.surf = pygame.Surface((random.randint(5,100), 12))
+        self.surf = pygame.Surface((random.randint(50,100), 12))
         self.surf.fill((random.randint(0,255),random.randint(0,255),random.randint(0,255)))
         self.rect = self.surf.get_rect(center = (random.randint(0,screen_width-10),random.randint(0, screen_height-30)))
 
@@ -136,11 +145,12 @@ while True:
         if event.type == pygame.KEYDOWN:    
             if event.key == pygame.K_SPACE:
                 P1.jump()
+        if event.type == pygame.KEYUP:    
+            if event.key == pygame.K_SPACE:
+                P1.cancel_jump()  
 
     P1.move()
     P1.update()
-    print(len(platforms))
-    print(P1.pos.y)
 
     if random.randint(0, 100) > 80 and len(platforms) > 1:
         index = random.randint(1, len(platforms)-1)
