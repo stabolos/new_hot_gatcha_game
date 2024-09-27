@@ -9,8 +9,8 @@ pygame.mixer.init()
 pygame.init()
 vec = pygame.math.Vector2 
 
-screen_height = 1000
-screen_width = 1800
+screen_height = 500
+screen_width = int(16 / 9 * screen_height)
 acceleration = 2
 friction = -0.25
 fps = 60
@@ -105,7 +105,7 @@ all_sprites.add(PT1)
 all_sprites.add(P1)
 
 
-for x in range(random.randint(100, 120)):
+for x in range(random.randint(35, 45)):
     pl = Platform()
     platforms.add(pl)
     all_sprites.add(pl)
@@ -113,11 +113,10 @@ for x in range(random.randint(100, 120)):
 platforms.add(PT1)
 
 def plat_gen():
-    while len(platforms) < 100 :
+    while len(platforms) < 30:
         width = random.randrange(50,100)
         p  = Platform()             
-        p.rect.center = (random.randrange(0, screen_width - width),
-                             random.randrange(-50, 0))
+        p.rect.center = (random.randrange(0, screen_width - width), random.randrange(-50, 0))
         platforms.add(p)
         all_sprites.add(p)
 
@@ -152,7 +151,7 @@ while True:
     P1.move()
     P1.update()
 
-    if random.randint(0, 100) > 80 and len(platforms) > 1:
+    if random.randint(0, 100) > 95 and len(platforms) > 1:
         index = random.randint(1, len(platforms)-1)
         platforms.sprites()[index].rect.midbottom = (0, 1000)
         platforms.remove(platforms.sprites()[index])
