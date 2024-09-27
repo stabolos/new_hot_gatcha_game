@@ -14,6 +14,7 @@ screen_width = int(16 / 9 * screen_height)
 acceleration = 2
 friction = -0.25
 fps = 60
+gravity = 0.5
 
 FramePerSec = pygame.time.Clock()
 
@@ -35,24 +36,37 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self):
         super().__init__()
-        self.surf = pygame.Surface((30, 30))
-        self.surf.fill((128,255,40))
+        #self.surf = pygame.Surface((30, 30))
+        self.surf = pygame.transform.scale(pygame.image.load('450.png').convert_alpha(), (30,30))
+        #self.surf.fill((128,255,40))
         self.rect = self.surf.get_rect()
 
         self.pos = vec((10, 385))
         self.vel = vec(0,0)
         self.acc = vec(0,0)
         self.jumping = False
+        self.dash_cooldown = 0
+        self.dash_speed = 50
+        self.grow = False
 
     def move(self):
-        self.acc = vec(0,0.5)
+        self.acc = vec(0,gravity)
     
         pressed_keys = pygame.key.get_pressed()
+
+        if pressed_keys[K_LSHIFT] and self.dash_cooldown <= 0:
+                self.vel = self.vel.normalize() * self.dash_speed
+                self.dash_cooldown = 250
+                #P1.surf.fill((235, 12, 30))
+                self.surf = pygame.transform.scale(pygame.image.load('ugandan-knuckles-orange-cartoon-character-illustration-png-clipart-thumbnail.png ').convert_alpha(), (30,30))
+
+        if pressed_keys[K_t]:
+            self.grow = not self.grow
                 
         if pressed_keys[K_a]:
-            self.acc.x = -acceleration
+                self.acc.x = -acceleration
         if pressed_keys[K_d]:
-            self.acc.x = acceleration 
+                self.acc.x = acceleration 
         
         self.acc.x += self.vel.x * friction
         self.vel += self.acc
@@ -121,6 +135,18 @@ def plat_gen():
         all_sprites.add(p)
 
 while True:
+    P1.dash_cooldown -= 1
+    if P1.dash_cooldown == 0:
+        #P1.surf.fill((128,255,40))
+        P1.surf = pygame.transform.scale(pygame.image.load('450.png').convert_alpha(), (30,30))
+
+    if P1.grow:
+        P1.surf = pygame.transform.scale(pygame.image.load('450.png').convert_alpha(), (P1.surf.get_width()+1,P1.surf.get_height()+1))
+    else:
+        #P1.surf = pygame.transform.scale(P1.surf, (P1.surf.get_width()- 1,P1.surf.get_height()-1))
+        pass
+        
+
     if P1.pos.y >= screen_height +10:
         death_sound.play()
         pygame.time.delay(800)  
@@ -144,9 +170,14 @@ while True:
         if event.type == pygame.KEYDOWN:    
             if event.key == pygame.K_SPACE:
                 P1.jump()
+            if event.key == pygame.K_q:
+                gravity = 0.5 if gravity == 0.0 else 0.0
+            if event.key == pygame.K_r:
+                gravity = -gravity
         if event.type == pygame.KEYUP:    
             if event.key == pygame.K_SPACE:
-                P1.cancel_jump()  
+                P1.cancel_jump() 
+         
 
     P1.move()
     P1.update()
