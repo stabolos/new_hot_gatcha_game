@@ -27,6 +27,7 @@ class Player(pygame.sprite.Sprite):
         self.pos = vec((10, 385))
         self.vel = vec(0,0)
         self.acc = vec(0,0)
+        self.jumping = False
 
     def move(self):
         self.acc = vec(0,0.5)
@@ -56,10 +57,16 @@ class Player(pygame.sprite.Sprite):
                 self.pos.y = hits[0].rect.top + 1
                 self.vel.y = 0
 
-    def jump(self):
+    def jump(self): 
         hits = pygame.sprite.spritecollide(self, platforms, False)
-        if hits:
-            self.vel.y = -15 
+        if hits and not self.jumping:
+           self.jumping = True
+           self.vel.y = -15 
+
+    def cancel_jump(self):
+        if self.jumping:
+            if self.vel.y < -3:
+                self.vel.y = -3
 
 class Platform(pygame.sprite.Sprite):
     def __init__(self):
@@ -101,6 +108,9 @@ while True:
         if event.type == pygame.KEYDOWN:    
             if event.key == pygame.K_SPACE:
                 P1.jump()
+        if event.type == pygame.KEYUP:    
+            if event.key == pygame.K_SPACE:
+                P1.cancel_jump()
 
     P1.move()
     P1.update()

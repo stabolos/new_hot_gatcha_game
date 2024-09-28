@@ -15,22 +15,14 @@ acceleration = 2
 friction = -0.25
 fps = 60
 gravity = 0.5
+font_typ = pygame.font.SysFont("Comic Sans", 60)
 
 FramePerSec = pygame.time.Clock()
 
 displaysurface = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Platformer")
 
-death_sound = pygame.mixer.Sound('death_sound.wav')
-
-
-# class DeathScreen(pygame.sprite.Sprite):
-#     def __init__(self):
-#         IMAGE = pygame.image.load('death.png').convert_alpha()
-#         super().__init__()
-#         self.image = IMAGE
-#         self.rect = self.image.get_rect(center=(screen_width / 2, screen_height / 2))
-
+death_sound = pygame.mixer.Sound('dark-souls-you-died-sound-effect_hm5sYFG.wav')
 
 class Player(pygame.sprite.Sprite):
 
@@ -134,6 +126,19 @@ def plat_gen():
         platforms.add(p)
         all_sprites.add(p)
 
+def game_over():
+        game_over_text = font_typ.render("GAME OVER", True, (255, 255, 255)) 
+        game_over_asset = pygame.image.load('gameover_sanic.png')
+        if P1.pos.y >= screen_height +10:
+            death_sound.play()
+            displaysurface.fill((0, 0, 0))
+            displaysurface.blit(game_over_text, (screen_width/2 - game_over_text.get_width()/2, screen_height/3))
+            displaysurface.blit(game_over_asset, (screen_width/2 - game_over_asset.get_width()/2, screen_height/1.8))
+            pygame.display.update()
+            pygame.time.delay(4800)  
+            pygame.quit()
+            sys.exit()
+
 while True:
     P1.dash_cooldown -= 1
     if P1.dash_cooldown == 0:
@@ -145,13 +150,8 @@ while True:
     else:
         #P1.surf = pygame.transform.scale(P1.surf, (P1.surf.get_width()- 1,P1.surf.get_height()-1))
         pass
-        
 
-    if P1.pos.y >= screen_height +10:
-        death_sound.play()
-        pygame.time.delay(800)  
-        pygame.quit()
-        sys.exit()
+    game_over()
     
     plat_gen()
     
@@ -178,7 +178,6 @@ while True:
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump() 
          
-
     P1.move()
     P1.update()
 
