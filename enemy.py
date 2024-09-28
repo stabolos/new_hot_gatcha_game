@@ -12,7 +12,7 @@ displaysurface = pygame.display.set_mode((100, 100))
 
 chase_speed = 4
 sound_on_kill = pygame.mixer.Sound('sounds/Greater_Bash.mp3')
-sound_on_charge = pygame.mixer.Sound("Charge_of_Darkness_cast.mp3")
+sound_on_charge = pygame.mixer.Sound("sounds/Charge_of_Darkness_cast.mp3")
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, enemy_image):
