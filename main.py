@@ -17,6 +17,7 @@ friction = -0.25
 fps = 60
 gravity = 0.5
 font_typ = pygame.font.SysFont("Comic Sans", 60)
+game_time = 0
 
 enemy = Enemy("images/download_2.png")
 
@@ -67,17 +68,21 @@ def plat_gen():
 def game_over():
         game_over_text = font_typ.render("GAME OVER", True, (255, 255, 255)) 
         game_over_asset = pygame.image.load('images/gameover_sanic.png')
-        if P1.pos.y >= screen_height +10:
-            death_sound.play()
-            displaysurface.fill((0, 0, 0))
-            displaysurface.blit(game_over_text, (screen_width/2 - game_over_text.get_width()/2, screen_height/3))
-            displaysurface.blit(game_over_asset, (screen_width/2 - game_over_asset.get_width()/2, screen_height/1.8))
-            pygame.display.update()
-            pygame.time.delay(1200)  
-            pygame.quit()
-            sys.exit()
+    
+        death_sound.play()
+        displaysurface.fill((0, 0, 0))
+        displaysurface.blit(game_over_text, (screen_width/2 - game_over_text.get_width()/2, screen_height/3))
+        displaysurface.blit(game_over_asset, (screen_width/2 - game_over_asset.get_width()/2, screen_height/1.8))
+        pygame.display.update()
+        pygame.time.delay(1200)  
+        pygame.quit()
+        sys.exit()
 
 while True:
+
+    if len(pygame.sprite.spritecollide(P1, [enemy], False)) == 1 and game_time >= 1:
+        enemy.kill_player()
+        game_over()
 
     enemy.move(P1)
 
@@ -91,7 +96,9 @@ while True:
         #P1.surf = pygame.transform.scale(P1.surf, (P1.surf.get_width()- 1,P1.surf.get_height()-1))
         pass
 
-    game_over()
+    if P1.pos.y >= screen_height +10:
+        game_over()
+
     
     plat_gen()
     
@@ -133,3 +140,4 @@ while True:
  
     pygame.display.update()
     FramePerSec.tick(fps)
+    game_time += 1

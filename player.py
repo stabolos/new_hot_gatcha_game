@@ -66,9 +66,6 @@ class Player(pygame.sprite.Sprite):
                     self.vel.y = 0
                     self.jumping = False
 
-        hits = pygame.sprite.spritecollide(self, [enemy], False)
-        if len(hits) != 0:
-            enemy.kill_player()
 
     def jump(self, platforms): 
         hits = pygame.sprite.spritecollide(self, platforms, False)
