@@ -33,11 +33,12 @@ class Enemy(pygame.sprite.Sprite):
         
         if direction.length() > 5:  
             if random.randint(1, 250) == 250:
+                sound_on_charge.play()
                 self.charging = 13
 
             if  self.charging > 0:
                 self.vel = direction.normalize() * 20
-                sound_on_charge.play()
+                
                 self.charging -= 1
             else:
                 self.vel = direction.normalize() * random.randint(1,5)
