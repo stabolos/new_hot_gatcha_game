@@ -30,6 +30,9 @@ class Enemy(pygame.sprite.Sprite):
 
     def move(self, player):
         direction = player.pos - self.pos
+
+        if random.randint(1, 1000) == 1000:
+            self.surf = pygame.transform.scale(pygame.image.load(self.image).convert_alpha(), (500,500))
         
         if direction.length() > 5:  
             if random.randint(1, 250) == 250:
