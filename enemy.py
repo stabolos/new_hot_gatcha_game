@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import random
+import numpy as np
 
 import pygame.mixer
 pygame.mixer.init()
@@ -25,14 +26,17 @@ class Enemy(pygame.sprite.Sprite):
         self.pos = vec(50, 50)  
         self.vel = vec(0, 0)
         self.charging = 0
+        self.growth_rate = vec(50,50)
+        self.dash_speed = 10
 
         self.rect = self.surf.get_rect(center=(50, 50))
 
     def move(self, player):
         direction = player.pos - self.pos
 
-        if random.randint(1, 1000) == 1000:
-            self.surf = pygame.transform.scale(pygame.image.load(self.image).convert_alpha(), (500,500))
+        if random.randint(1, 100) == 100:
+            self.growth_rate *= 1.1
+            self.surf = pygame.transform.scale(pygame.image.load(self.image).convert_alpha(), self.growth_rate)
         
         if direction.length() > 5:  
             if random.randint(1, 250) == 250:
@@ -40,14 +44,15 @@ class Enemy(pygame.sprite.Sprite):
                 self.charging = 13
 
             if  self.charging > 0:
-                self.vel = direction.normalize() * 20
+                self.dash_speed += 1.2
+                self.vel = direction.normalize() * self.dash_speed
                 
                 self.charging -= 1
             else:
                 self.vel = direction.normalize() * random.randint(1,5)
 
         else:
-            self.vel = vec(0, 0)  # Stop moving when close enough
+            self.vel = vec(0, 0)  
         
         self.pos += self.vel
         self.rect.center = (round(self.pos.x), round(self.pos.y))
