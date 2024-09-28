@@ -12,6 +12,7 @@ displaysurface = pygame.display.set_mode((100, 100))
 
 chase_speed = 4
 sound_on_kill = pygame.mixer.Sound('sounds/Greater_Bash.mp3')
+sound_on_charge = pygame.mixer.Sound("Charge_of_Darkness_cast.mp3")
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, enemy_image):
@@ -30,7 +31,12 @@ class Enemy(pygame.sprite.Sprite):
         direction = player.pos - self.pos
         
         if direction.length() > 5:  # Adjust the threshold as needed
-            self.vel = direction.normalize() * random.randint(1,20)
+            if random.randint(1, 100) != 100:
+                self.vel = direction.normalize() * random.randint(1,5)
+            else:
+                self.vel = direction.normalize() * 35
+                sound_on_charge.play()
+
         else:
             self.vel = vec(0, 0)  # Stop moving when close enough
         
