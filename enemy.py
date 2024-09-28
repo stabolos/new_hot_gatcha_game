@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+import random
 
 import pygame.mixer
 pygame.mixer.init()
@@ -29,7 +30,7 @@ class Enemy(pygame.sprite.Sprite):
         direction = player.pos - self.pos
         
         if direction.length() > 5:  # Adjust the threshold as needed
-            self.vel = direction.normalize() * chase_speed
+            self.vel = direction.normalize() * random.randint(1,20)
         else:
             self.vel = vec(0, 0)  # Stop moving when close enough
         
