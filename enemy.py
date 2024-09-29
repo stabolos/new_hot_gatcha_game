@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 import random
-import numpy as np
+
 
 import pygame.mixer
 pygame.mixer.init()
