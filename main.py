@@ -7,7 +7,7 @@ from enemy import Enemy
 
 import pygame.mixer
 pygame.mixer.init()
-
+ 
 pygame.init()
 vec = pygame.math.Vector2 
 
@@ -68,7 +68,7 @@ def plat_gen():
 def game_over():
         game_over_text = font_typ.render("GAME OVER", True, (255, 255, 255)) 
         game_over_asset = pygame.image.load('images/gameover_sanic.png')
-    
+        pygame.mixer.music.stop()
         death_sound.play()
         displaysurface.fill((0, 0, 0))
         displaysurface.blit(game_over_text, (screen_width/2 - game_over_text.get_width()/2, screen_height/3))
@@ -78,12 +78,16 @@ def game_over():
         pygame.quit()
         sys.exit()
 
+pygame.mixer.music.load('sounds/Ambient_Music.mp3')
+pygame.mixer.music.play(True,)
+pygame.mixer.music.set_volume(1)
+
 while True:
 
     if len(pygame.sprite.spritecollide(P1, [enemy], False)) == 1 and game_time >= 1:
         enemy.kill_player()
-        game_over()
 
+    print(pygame.sprite.spritecollide(P1, [enemy], False))
     enemy.move(P1)
 
     P1.dash_cooldown -= 1
@@ -101,7 +105,7 @@ while True:
 
     
     plat_gen()
-    
+     
     if P1.rect.top <= screen_height / 3:
         P1.pos.y += abs(P1.vel.y)
         for plat in platforms:
@@ -124,7 +128,7 @@ while True:
         if event.type == pygame.KEYUP:    
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump() 
-         
+
     P1.move()
     P1.update(platforms, enemy)
 
