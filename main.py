@@ -136,7 +136,7 @@ while True:
     displaysurface.fill((0,0,0))
  
     for entity in all_sprites:
-        displaysurface.blit(entity.surf, entity.rect)
+        displaysurface.blit(entity.surf, entity.rect.move(-P1.rect.x + screen_width / 2, -P1.rect.y + screen_height / 2))
  
     pygame.display.update()
     FramePerSec.tick(fps)
