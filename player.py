@@ -19,7 +19,8 @@ class Player(pygame.sprite.Sprite):
         self.surf.fill((0,255,0))
         self.rect = self.surf.get_rect()
         self.gravity = gravity
-
+        self.counter_jump = 0
+        self.counter_jump_max = 3
         self.acceleration = 2
         self.acc = vec(0,0)
 
@@ -27,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.vel = vec(0,0)
         self.jumping = False
         self.dash_cooldown = 0
-        self.dash_speed = 50
+        self.dash_speed = 25
         self.grow = False
         self.friction = friction
         self.rechts = False
@@ -70,7 +71,8 @@ class Player(pygame.sprite.Sprite):
                 if self.pos.y < hits[0].rect.bottom:               
                     self.pos.y = hits[0].rect.top +1
                     self.vel.y = 0
-                    self.jumping = False     
+                    self.jumping = False  
+                    self.counter_jump = 0   
 
         hits = pygame.sprite.spritecollide(self ,walls, False)        
         if hits:    
@@ -79,13 +81,13 @@ class Player(pygame.sprite.Sprite):
                     y_vorzeichen = self.vel.y / (abs(self.vel.y) if self.vel.y != 0 else 1) * -1 
                     self.pos.y = collider_center[1] + (( hits[0].rect.height / 2 ) * y_vorzeichen)  
                     self.jumping = False
+                    self.counter_jump = 0
                     self.vel.y = min(self.vel.y, 0)
 
                 elif self.pos.y > hits[0].rect.bottom and self.vel.y < 0:
                     collider_center = hits[0].rect.center
                     y_vorzeichen = self.vel.y / (abs(self.vel.y) if self.vel.y != 0 else 1) * -1 
                     self.pos.y = collider_center[1] + (( hits[0].rect.height / 2 ) + self.rect.height) 
-                    self.jumping = False
                     self.vel.y = 0   
 
                 else:
@@ -108,19 +110,15 @@ class Player(pygame.sprite.Sprite):
 
     def jump(self, platforms, walls): 
         hits = pygame.sprite.spritecollide(self, platforms, False)
-        if hits and not self.jumping:
-           self.jumping = True
-           self.vel.y = -15
-        
         player_copy = copy.copy(self)
         player_copy.rect.bottom += 10
-        
-        hits = pygame.sprite.spritecollide(player_copy, walls, False)
+        hits_w = pygame.sprite.spritecollide(player_copy, walls, False)
         del player_copy
         
-        if hits and not self.jumping:
+        if hits or hits_w or self.counter_jump < self.counter_jump_max:
            self.jumping = True
            self.vel.y = -15
+           self.counter_jump += 1
  
     def cancel_jump(self):
         if self.jumping:

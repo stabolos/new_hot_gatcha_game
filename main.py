@@ -115,7 +115,6 @@ while True:
         pass
 
     
-    
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
