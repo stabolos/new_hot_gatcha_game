@@ -3,7 +3,7 @@ from pygame.locals import *
 import sys
 import random
 from player import Player
-from enemy import Enemy
+
 
 import pygame.mixer
 pygame.mixer.init()
@@ -19,7 +19,7 @@ gravity = 0.5
 font_typ = pygame.font.SysFont("Comic Sans", 60)
 game_time = 0
 
-enemy = Enemy("images/download_2.png")
+
 
 FramePerSec = pygame.time.Clock()
 
@@ -47,7 +47,7 @@ platforms = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
 all_sprites.add(P1)
-all_sprites.add(enemy)
+
 
 
 for x in range(random.randint(35, 45)):
@@ -80,11 +80,7 @@ def game_over():
 
 while True:
 
-    if len(pygame.sprite.spritecollide(P1, [enemy], False)) == 1 and game_time >= 1:
-        enemy.kill_player()
-        game_over()
 
-    enemy.move(P1)
 
     P1.dash_cooldown -= 1
     if P1.dash_cooldown == 0:
@@ -102,12 +98,6 @@ while True:
     
     plat_gen()
     
-    if P1.rect.top <= screen_height / 3:
-        P1.pos.y += abs(P1.vel.y)
-        for plat in platforms:
-            plat.rect.y += abs(P1.vel.y)
-            if plat.rect.top >= screen_height:
-                plat.kill()
 
 
     for event in pygame.event.get():
@@ -126,17 +116,15 @@ while True:
                 P1.cancel_jump() 
          
     P1.move()
-    P1.update(platforms, enemy)
+    P1.update(platforms)
 
-    if random.randint(0, 100) > 95 and len(platforms) > 1:
-        index = random.randint(1, len(platforms)-1)
-        platforms.sprites()[index].rect.midbottom = (0, 1000)
-        platforms.remove(platforms.sprites()[index])
+
 
     displaysurface.fill((0,0,0))
  
     for entity in all_sprites:
         displaysurface.blit(entity.surf, entity.rect.move(-P1.rect.x + screen_width / 2, -P1.rect.y + screen_height / 2))
+        #displaysurface.blit(entity.surf,entity.rect)
  
     pygame.display.update()
     FramePerSec.tick(fps)

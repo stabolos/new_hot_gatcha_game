@@ -57,7 +57,7 @@ class Player(pygame.sprite.Sprite):
         
         self.rect.midbottom = self.pos
     
-    def update(self, platforms, enemy):
+    def update(self, platforms):
         hits = pygame.sprite.spritecollide(self ,platforms, False)
         if self.vel.y > 0:        
             if hits:
