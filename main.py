@@ -3,7 +3,8 @@ from pygame.locals import *
 import sys
 import random
 from player import Player
-from enemy import Enemy
+# from enemy import Enemy
+from walls import Walls
 
 import pygame.mixer
 pygame.mixer.init()
@@ -19,7 +20,7 @@ gravity = 0.5
 font_typ = pygame.font.SysFont("Comic Sans", 60)
 game_time = 0
 
-enemy = Enemy("images/download_2.png")
+# enemy = Enemy("images/download_2.png")
 
 FramePerSec = pygame.time.Clock()
 
@@ -42,28 +43,36 @@ PT1.surf = pygame.Surface((screen_width, 20))
 PT1.surf.fill((255,0,0))
 PT1.rect = PT1.surf.get_rect(center = (screen_width/2, screen_height - 10))
 
+W1 = Walls(10, 20)
+W1.surf = pygame.Surface((20, screen_height))
+W1.surf.fill((255,0,0))
+W1.rect = W1.surf.get_rect(center = (screen_width /2, screen_height / 2))
+
+W2 = Walls(10, 20)
+W2.surf = pygame.Surface((100, 50))
+W2.surf.fill((255,0,0))
+W2.rect = W2.surf.get_rect(center = (100, screen_height - 80))
+
 platforms = pygame.sprite.Group()
+walls = pygame.sprite.Group()
+walls.add(W1)
+walls.add(W2)
 
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
 all_sprites.add(P1)
-all_sprites.add(enemy)
+all_sprites.add(W1)
+all_sprites.add(W2)
+
+# all_sprites.add(enemy)
 
 
-for x in range(random.randint(35, 45)):
-    pl = Platform()
-    platforms.add(pl)
-    all_sprites.add(pl)
+# for x in range(random.randint(35, 45)):
+#     pl = Platform()
+#     platforms.add(pl)
+#     all_sprites.add(pl)
 
 platforms.add(PT1)
-
-def plat_gen():
-    while len(platforms) < 30:
-        width = random.randrange(50,100)
-        p  = Platform()             
-        p.rect.center = (random.randrange(0, screen_width - width), random.randrange(-50, 0))
-        platforms.add(p)
-        all_sprites.add(p)
 
 def game_over():
         game_over_text = font_typ.render("GAME OVER", True, (255, 255, 255)) 
@@ -78,17 +87,18 @@ def game_over():
         pygame.quit()
         sys.exit()
 
-pygame.mixer.music.load('sounds/Ambient_Music.mp3')
-pygame.mixer.music.play(True,)
-pygame.mixer.music.set_volume(1)
+# pygame.mixer.music.load('sounds/Ambient_Music.mp3')
+# pygame.mixer.music.play(True,)
+# pygame.mixer.music.set_volume(1)
 
 while True:
 
-    if len(pygame.sprite.spritecollide(P1, [enemy], False)) == 1 and game_time >= 1:
-        enemy.kill_player()
+    
+    # if len(pygame.sprite.spritecollide(P1, [enemy], False)) == 1 and game_time >= 1:
+    #     enemy.kill_player()
 
-    print(pygame.sprite.spritecollide(P1, [enemy], False))
-    enemy.move(P1)
+    # print(pygame.sprite.spritecollide(P1, [enemy], False))
+    # enemy.move(P1)
 
     P1.dash_cooldown -= 1
     if P1.dash_cooldown == 0:
@@ -101,26 +111,18 @@ while True:
         pass
 
     if P1.pos.y >= screen_height +10:
-        game_over()
+        # game_over()
+        pass
 
     
-    plat_gen()
-     
-    if P1.rect.top <= screen_height / 3:
-        P1.pos.y += abs(P1.vel.y)
-        for plat in platforms:
-            plat.rect.y += abs(P1.vel.y)
-            if plat.rect.top >= screen_height:
-                plat.kill()
-
-
+    
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:    
             if event.key == pygame.K_SPACE:
-                P1.jump(platforms)
+                P1.jump(platforms, walls)
             if event.key == pygame.K_q:
                 P1.gravity = 0.5 if P1.gravity == 0.0 else 0.0
             if event.key == pygame.K_r:
@@ -130,18 +132,21 @@ while True:
                 P1.cancel_jump() 
 
     P1.move()
-    P1.update(platforms, enemy)
+    P1.update(platforms, walls)
+   
 
     if random.randint(0, 100) > 95 and len(platforms) > 1:
         index = random.randint(1, len(platforms)-1)
-        platforms.sprites()[index].rect.midbottom = (0, 1000)
-        platforms.remove(platforms.sprites()[index])
+        # platforms.sprites()[index].rect.midbottom = (0, 1000)
+        # platforms.remove(platforms.sprites()[index])
 
     displaysurface.fill((0,0,0))
  
     for entity in all_sprites:
-        displaysurface.blit(entity.surf, entity.rect)
+        displaysurface.blit(entity.surf, entity.rect.move(-P1.rect.x + screen_width / 2, -P1.rect.y + screen_height / 2))
+        
  
     pygame.display.update()
+
     FramePerSec.tick(fps)
     game_time += 1
