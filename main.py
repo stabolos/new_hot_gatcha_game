@@ -28,6 +28,8 @@ pygame.display.set_caption("Platformer")
 
 death_sound = pygame.mixer.Sound('sounds/dark-souls-you-died-sound-effect_hm5sYFG.wav')
 
+#GUN 
+GUN = ("images/gun.png")
 
 class Platform(pygame.sprite.Sprite):
     def __init__(self):
@@ -48,6 +50,7 @@ all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
 all_sprites.add(P1)
 all_sprites.add(enemy)
+all_sprites.add(GUN)
 
 
 for x in range(random.randint(35, 45)):
