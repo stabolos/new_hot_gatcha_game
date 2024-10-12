@@ -1,26 +1,22 @@
 import pygame
 from pygame.locals import *
 import sys
-import random
 from player import Player
-from enemy import Enemy
-
+from walls import Walls
+from platform_1 import Platform
+from gameoptions import screendimensions
 import pygame.mixer
+from jsonLoader import jsonL 
 pygame.mixer.init()
-
+ 
 pygame.init()
 vec = pygame.math.Vector2 
-
-screen_height = 500
-screen_width = int(16 / 9 * screen_height)
-friction = -0.25
+screen = screendimensions()
+screen_height = screen[1]
+screen_width = screen[0]
 fps = 60
-gravity = 0.5
 font_typ = pygame.font.SysFont("Comic Sans", 60)
 game_time = 0
-
-enemy = Enemy("images/download_2.png")
-
 FramePerSec = pygame.time.Clock()
 
 displaysurface = pygame.display.set_mode((screen_width, screen_height))
@@ -28,47 +24,34 @@ pygame.display.set_caption("Platformer")
 
 death_sound = pygame.mixer.Sound('sounds/dark-souls-you-died-sound-effect_hm5sYFG.wav')
 
-
-class Platform(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.surf = pygame.Surface((random.randint(50,100), 12))
-        self.surf.fill((random.randint(0,255),random.randint(0,255),random.randint(0,255)))
-        self.rect = self.surf.get_rect(center = (random.randint(0,screen_width-10),random.randint(0, screen_height-30)))
+jL = jsonL()
+platforms_from_json = jL.getPlatforms()
 
 PT1 = Platform()
-P1 = Player(gravity, friction)
-PT1.surf = pygame.Surface((screen_width, 20))
+P1 = Player()
+PT1.surf = pygame.Surface((screen_width, 30))
 PT1.surf.fill((255,0,0))
 PT1.rect = PT1.surf.get_rect(center = (screen_width/2, screen_height - 10))
 
 platforms = pygame.sprite.Group()
+walls = pygame.sprite.Group()
+
 
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
 all_sprites.add(P1)
-all_sprites.add(enemy)
 
-
-for x in range(random.randint(35, 45)):
-    pl = Platform()
-    platforms.add(pl)
-    all_sprites.add(pl)
+for wall in platforms_from_json:
+    wall = Walls(wall["dimension"], wall["position"], wall["color"])
+    walls.add(wall)
+    all_sprites.add(wall)
 
 platforms.add(PT1)
-
-def plat_gen():
-    while len(platforms) < 30:
-        width = random.randrange(50,100)
-        p  = Platform()             
-        p.rect.center = (random.randrange(0, screen_width - width), random.randrange(-50, 0))
-        platforms.add(p)
-        all_sprites.add(p)
 
 def game_over():
         game_over_text = font_typ.render("GAME OVER", True, (255, 255, 255)) 
         game_over_asset = pygame.image.load('images/gameover_sanic.png')
-    
+        pygame.mixer.music.stop()
         death_sound.play()
         displaysurface.fill((0, 0, 0))
         displaysurface.blit(game_over_text, (screen_width/2 - game_over_text.get_width()/2, screen_height/3))
@@ -78,45 +61,21 @@ def game_over():
         pygame.quit()
         sys.exit()
 
+# pygame.mixer.music.load('sounds/Ambient_Music.mp3')
+# pygame.mixer.music.play(True,)
+# pygame.mixer.music.set_volume(1)
+
 while True:
 
-    if len(pygame.sprite.spritecollide(P1, [enemy], False)) == 1 and game_time >= 1:
-        enemy.kill_player()
-        game_over()
-
-    enemy.move(P1)
-
-    P1.dash_cooldown -= 1
-    if P1.dash_cooldown == 0:
-        P1.surf = pygame.transform.scale(pygame.image.load(P1.get_player_sprite() ).convert_alpha(), (30,30))
-
-    if P1.grow:
-        P1.surf = pygame.transform.scale(pygame.image.load(P1.get_player_sprite()).convert_alpha(), (P1.surf.get_width()+1,P1.surf.get_height()+1))
-    else:
-        #P1.surf = pygame.transform.scale(P1.surf, (P1.surf.get_width()- 1,P1.surf.get_height()-1))
-        pass
-
-    if P1.pos.y >= screen_height +10:
-        game_over()
-
+    P1.dash_cooldown_tick()
     
-    plat_gen()
-    
-    if P1.rect.top <= screen_height / 3:
-        P1.pos.y += abs(P1.vel.y)
-        for plat in platforms:
-            plat.rect.y += abs(P1.vel.y)
-            if plat.rect.top >= screen_height:
-                plat.kill()
-
-
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:    
             if event.key == pygame.K_SPACE:
-                P1.jump(platforms)
+                P1.jump(platforms, walls)
             if event.key == pygame.K_q:
                 P1.gravity = 0.5 if P1.gravity == 0.0 else 0.0
             if event.key == pygame.K_r:
@@ -124,14 +83,9 @@ while True:
         if event.type == pygame.KEYUP:    
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump() 
-         
-    P1.move()
-    P1.update(platforms, enemy)
 
-    if random.randint(0, 100) > 95 and len(platforms) > 1:
-        index = random.randint(1, len(platforms)-1)
-        platforms.sprites()[index].rect.midbottom = (0, 1000)
-        platforms.remove(platforms.sprites()[index])
+    P1.move()
+    P1.update(platforms, walls)
 
     displaysurface.fill((0,0,0))
  
@@ -139,5 +93,6 @@ while True:
         displaysurface.blit(entity.surf, entity.rect.move(-P1.rect.x + screen_width / 2, -P1.rect.y + screen_height / 2))
  
     pygame.display.update()
+
     FramePerSec.tick(fps)
     game_time += 1
