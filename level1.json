@@ -1,5 +1,6 @@
 {
     "platforms" : [
-      {"dimension" : [10000,80], "position" : [450, 500], "color" : [255,0,0]}
+      {"dimension" : [200,800], "position" : [450, 400], "color" : [255,0,0]},
+      {"dimension" : [1000,80], "position" : [450, 500], "color" : [255,0,0]}
     ]
 }

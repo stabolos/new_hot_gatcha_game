@@ -49,19 +49,21 @@ class Player(pygame.sprite.Sprite):
         if pressed_keys[K_t]:
             self.grow = not self.grow
                 
-        if pressed_keys[K_a] and not self.links:
+        if pressed_keys[K_a]:
                 self.acc.x = -self.acceleration
-        if pressed_keys[K_d] and not self.rechts:
-                self.acc.x = self.acceleration 
+        if pressed_keys[K_d]:
+                self.acc.x = self.acceleration
         
         self.acc.x += self.vel.x * self.friction
         self.vel += self.acc
 
+        print(self.vel)
         if abs(self.vel[0]) > self.speedlimit[0]:
            self.vel[0] = self.vel[0]/abs(self.vel[0]) * self.speedlimit[0]
 
         if abs(self.vel[1]) > self.speedlimit[1]: 
            self.vel[1] = self.vel[1]/abs(self.vel[1]) * self.speedlimit[1]  
+
 
         self.pos += self.vel + 0.5 * self.acc
 
