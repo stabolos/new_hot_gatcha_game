@@ -1,3 +1,5 @@
 {
-    "platforms" : [[200,20],[100,50],[10,150]]
+    "platforms" : [{"dimension" : [200,20], "position" : [450, 700], "color" : [255,0,0]},
+                   {"dimension" : [200,40], "position" : [450, 400], "color" : [255,0,0]},
+                   {"dimension" : [200,80], "position" : [450, 200], "color" : [255,0,0]}]
 }

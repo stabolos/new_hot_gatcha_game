@@ -6,6 +6,7 @@ from walls import Walls
 from platform_1 import Platform
 from gameoptions import screendimensions
 import pygame.mixer
+from jsonLoader import jsonL 
 pygame.mixer.init()
  
 pygame.init()
@@ -23,32 +24,27 @@ pygame.display.set_caption("Platformer")
 
 death_sound = pygame.mixer.Sound('sounds/dark-souls-you-died-sound-effect_hm5sYFG.wav')
 
+jL = jsonL()
+platforms_from_json = jL.getPlatforms()
+
 PT1 = Platform()
 P1 = Player()
 PT1.surf = pygame.Surface((screen_width, 30))
 PT1.surf.fill((255,0,0))
 PT1.rect = PT1.surf.get_rect(center = (screen_width/2, screen_height - 10))
 
-W1 = Walls()
-W1.surf = pygame.Surface((20, screen_height))
-W1.surf.fill((255,0,0))
-W1.rect = W1.surf.get_rect(center = (screen_width /2, screen_height / 2))
-
-W2 = Walls()
-W2.surf = pygame.Surface((100, 50))
-W2.surf.fill((255,0,0))
-W2.rect = W2.surf.get_rect(center = (100, screen_height - 80))
-
 platforms = pygame.sprite.Group()
 walls = pygame.sprite.Group()
-walls.add(W1)
-walls.add(W2)
+
 
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
 all_sprites.add(P1)
-all_sprites.add(W1)
-all_sprites.add(W2)
+
+for wall in platforms_from_json:
+    wall = Walls(wall["dimension"], wall["position"], wall["color"])
+    walls.add(wall)
+    all_sprites.add(wall)
 
 platforms.add(PT1)
 
