@@ -10,6 +10,7 @@ screen_width = int(16 / 9 * screen_height)
 dash_cooldown_sprite = "images/ugandan-knuckles-orange-cartoon-character-illustration-png-clipart-thumbnail.png"
 player_sprite = "images/450.png"
 
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self):
@@ -109,9 +110,9 @@ class Player(pygame.sprite.Sprite):
                     self.counter_jump_max = self.counter_jump_max_static + 1
 
                     if pressed_keys[K_a] or pressed_keys[K_d]:
-                        self.speedlimit[1] *= 0.925 
+                        # ist fucked, aber wusste nicht wie ich das sonst mache ¯\_(ツ)_/¯ 
+                        self.speedlimit[1] = 1 
                         print(self.speedlimit)
-
                 
                     if x_vorzeichen <= 0:
                          self.links = True
