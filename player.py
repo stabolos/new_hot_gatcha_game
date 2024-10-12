@@ -65,59 +65,56 @@ class Player(pygame.sprite.Sprite):
 
         self.pos += self.vel + 0.5 * self.acc
 
-        if self.pos.x > screen_width:
-            self.pos.x = 0
-        if self.pos.x < 0:
-            self.pos.x = screen_width
         
 
         self.rect.midbottom = self.pos
     
-    def update(self, platforms, walls):
+    def update(self, walls):
         sidewall = False
         pressed_keys = pygame.key.get_pressed()
-        hits = pygame.sprite.spritecollide(self ,platforms, False)
-        if self.vel.y > 0:        
-            if hits:
-                if self.pos.y < hits[0].rect.bottom:               
-                    self.pos.y = hits[0].rect.top +1
-                    self.vel.y = 0
-                    self.jumping = False  
-                    self.counter_jump = 0   
+        #hits = pygame.sprite.spritecollide(self ,platforms, False)
+        #if self.vel.y > 0:
+        #    if hits:
+        #        if self.pos.y < hits[0].rect.bottom:
+        #            self.pos.y = hits[0].rect.top +1
+        #            self.vel.y = 0
+        #            self.jumping = False
+        #            self.counter_jump = 0
 
         hits = pygame.sprite.spritecollide(self ,walls, False)        
-        if hits:    
-                if self.pos.y - self.rect.height / 2 < hits[0].rect.top and self.vel.y > 0:
-                    collider_center = hits[0].rect.center
-                    y_vorzeichen = self.vel.y / (abs(self.vel.y) if self.vel.y != 0 else 1) * -1 
-                    self.pos.y = collider_center[1] + (( hits[0].rect.height / 2 ) * y_vorzeichen)  
-                    self.jumping = False
-                    self.counter_jump = 0
-                    self.vel.y = min(self.vel.y, 0)
+        if hits:
+                for hit in hits:
+                    if self.pos.y - self.rect.height / 2 < hit.rect.top and self.vel.y > 0:
+                        collider_center = hit.rect.center
+                        y_vorzeichen = self.vel.y / (abs(self.vel.y) if self.vel.y != 0 else 1) * -1
+                        self.pos.y = collider_center[1] + (( hit.rect.height / 2 ) * y_vorzeichen)
+                        self.jumping = False
+                        self.counter_jump = 0
+                        self.vel.y = min(self.vel.y, 0)
 
-                elif self.pos.y > hits[0].rect.bottom and self.vel.y < 0:
-                    collider_center = hits[0].rect.center
-                    y_vorzeichen = self.vel.y / (abs(self.vel.y) if self.vel.y != 0 else 1) * -1 
-                    self.pos.y = collider_center[1] + (( hits[0].rect.height / 2 ) + self.rect.height) 
-                    self.vel.y = 0   
+                    elif self.pos.y > hit.rect.bottom and self.vel.y < 0:
+                        collider_center = hit.rect.center
+                        y_vorzeichen = self.vel.y / (abs(self.vel.y) if self.vel.y != 0 else 1) * -1
+                        self.pos.y = collider_center[1] + (( hit.rect.height / 2 ) + self.rect.height)
+                        self.vel.y = 0
 
-                else:
-                    sidewall = True
-                    collider_center = hits[0].rect.center
-                    x_vorzeichen = self.vel.x / (abs(self.vel.x) if self.vel.x != 0 else 1) * -1 
-                    self.pos.x = collider_center[0] + ((self.rect.width / 2 + hits[0].rect.width / 2 ) * x_vorzeichen)
-                    self.vel.x = 0
-                    self.counter_jump_max = self.counter_jump_max_static + 1
-
-                    if pressed_keys[K_a] or pressed_keys[K_d]:
-                        # ist fucked, aber wusste nicht wie ich das sonst mache ¯\_(ツ)_/¯ 
-                        self.speedlimit[1] = 1 
-                        print(self.speedlimit)
-                
-                    if x_vorzeichen <= 0:
-                         self.links = True
                     else:
-                         self.rechts = True
+                        sidewall = True
+                        collider_center = hit.rect.center
+                        x_vorzeichen = self.vel.x / (abs(self.vel.x) if self.vel.x != 0 else 1) * -1
+                        self.pos.x = collider_center[0] + ((self.rect.width / 2 + hit.rect.width / 2 ) * x_vorzeichen)
+                        self.vel.x = 0
+                        self.counter_jump_max = self.counter_jump_max_static + 1
+
+                        if pressed_keys[K_a] or pressed_keys[K_d] and sidewall:
+                            # ist fucked, aber wusste nicht wie ich das sonst mache ¯\_(ツ)_/¯
+                            self.speedlimit[1] *= 0.5
+                            print(self.speedlimit)
+
+                        if x_vorzeichen <= 0:
+                             self.links = True
+                        else:
+                             self.rechts = True
         else:
              self.links = False
              self.rechts = False
@@ -130,14 +127,13 @@ class Player(pygame.sprite.Sprite):
         
         self.rect.midbottom = self.pos
 
-    def jump(self, platforms, walls): 
-        hits = pygame.sprite.spritecollide(self, platforms, False)
+    def jump(self, walls):
         player_copy = copy.copy(self)
         player_copy.rect.bottom += 10
         hits_w = pygame.sprite.spritecollide(player_copy, walls, False)
         del player_copy
         
-        if hits or hits_w or self.counter_jump < self.counter_jump_max:
+        if hits_w or self.counter_jump < self.counter_jump_max:
            self.jumping = True
            self.vel.y = -15
            self.counter_jump += 1

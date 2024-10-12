@@ -6,7 +6,8 @@ from walls import Walls
 from platform_1 import Platform
 from gameoptions import screendimensions
 import pygame.mixer
-from jsonLoader import jsonL 
+from jsonLoader import jsonL
+from enemy import *
 pygame.mixer.init()
  
 pygame.init()
@@ -27,18 +28,15 @@ death_sound = pygame.mixer.Sound('sounds/dark-souls-you-died-sound-effect_hm5sYF
 jL = jsonL()
 platforms_from_json = jL.getPlatforms()
 
-PT1 = Platform()
 P1 = Player()
-PT1.surf = pygame.Surface((screen_width, 30))
-PT1.surf.fill((255,0,0))
-PT1.rect = PT1.surf.get_rect(center = (screen_width/2, screen_height - 10))
-
-platforms = pygame.sprite.Group()
-walls = pygame.sprite.Group()
 
 
 all_sprites = pygame.sprite.Group()
-all_sprites.add(PT1)
+walls = pygame.sprite.Group()
+npcs = pygame.sprite.Group()
+enemy = GravityAffectedEnemy("images/download_2.png")
+npcs.add(enemy)
+all_sprites.add(enemy)
 all_sprites.add(P1)
 
 for wall in platforms_from_json:
@@ -46,7 +44,6 @@ for wall in platforms_from_json:
     walls.add(wall)
     all_sprites.add(wall)
 
-platforms.add(PT1)
 
 def game_over():
         game_over_text = font_typ.render("GAME OVER", True, (255, 255, 255)) 
@@ -75,7 +72,7 @@ while True:
             sys.exit()
         if event.type == pygame.KEYDOWN:    
             if event.key == pygame.K_SPACE:
-                P1.jump(platforms, walls)
+                P1.jump(walls)
             if event.key == pygame.K_q:
                 P1.gravity = 0.5 if P1.gravity == 0.0 else 0.0
             if event.key == pygame.K_r:
@@ -85,7 +82,11 @@ while True:
                 P1.cancel_jump() 
 
     P1.move()
-    P1.update(platforms, walls)
+    enemy.move(P1)
+
+    P1.update(walls)
+    for npc in npcs:
+        npc.collide(walls)
 
     displaysurface.fill((0,0,0))
  
